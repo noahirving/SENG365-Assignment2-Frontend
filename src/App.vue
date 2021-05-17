@@ -1,12 +1,42 @@
 <template>
-  <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link> |
-    <router-link to="/events">Events</router-link>
-  </div>
+  <el-menu :default-active="activeIndex" mode="horizontal" @select="handleSelect">
+    <el-menu-item v-for="(route, index) in routes" :key="index" :index="(index).toString()">
+      <router-link :to="route.path">
+        {{route.name}}
+      </router-link>
+    </el-menu-item>
+  </el-menu>
   <router-view/>
 </template>
 
+<script>
+export default {
+  name: "App",
+  data() {
+    return {
+      activeIndex: "0",
+      routes: [
+        {
+          path:"/",
+          name: "Home"
+        },
+        {
+          path: "/events",
+          name: "Events"
+        }
+      ]
+    }
+  },
+  methods: {
+    startHacking() {
+      this.msg = "Start coding with Element Plus with 💖";
+    },
+    handleSelect(key, keyPath) {
+      console.log(key, keyPath);
+    }
+  }
+}
+</script>
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
