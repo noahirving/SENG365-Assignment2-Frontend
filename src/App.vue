@@ -1,9 +1,7 @@
 <template>
   <el-menu :default-active="activeIndex" mode="horizontal" @select="handleSelect">
-    <el-menu-item v-for="(route, index) in routes" :key="index" :index="(index).toString()">
-      <router-link :to="route.path">
-        {{route.name}}
-      </router-link>
+    <el-menu-item v-for="(route, index) in routes" :key="index" :index="(index).toString()" @click="$router.push(route.path)">
+      {{route.name}}
     </el-menu-item>
   </el-menu>
   <router-view/>
