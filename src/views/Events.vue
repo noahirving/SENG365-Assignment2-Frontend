@@ -1,6 +1,7 @@
 <template>
   <h1>Events</h1>
-  <el-row type="flex">
+  <el-row type="flex" justify="center">
+    <!-- Search bar -->
     <el-col :span="12">
       <el-input placeholder="Please input" v-model="q" @keyup.enter="getEvents">
       <template #prepend>
@@ -8,6 +9,8 @@
       </template>
       </el-input>
     </el-col>
+
+    <!-- Categories -->
     <el-col :span="3">
       <el-dropdown :hide-on-click="false" :max-height="300">
         <el-button type="primary">
@@ -24,6 +27,8 @@
         </template>
       </el-dropdown>
     </el-col>
+
+    <!-- Sort by -->
     <el-col :span="3">
       <el-select v-model="sortBy" placeholder="Sort by" >
         <el-option v-for="sort in sortings" :key="sort.key" :label="sort.name" :value="sort.key"></el-option>
@@ -32,6 +37,7 @@
   </el-row>
 
 
+  <!-- Results -->
   <el-table
       :data="events"
       stripe
@@ -48,9 +54,14 @@
     <el-table-column
       prop="numAcceptedAttendees"
       label="Attendees"/>
+    <el-table-column>
+      <template #default="props">
+        <el-button type="text" @click="viewEvent(props.row.eventId)">View</el-button>
+      </template>
+    </el-table-column>
   </el-table>
 
-
+  <!-- Pagination -->
   <el-pagination
       layout="prev, pager, next"
       :page-size="pageSize"
@@ -109,9 +120,6 @@ export default {
     }
   },
   methods: {
-    handle(val) {
-      console.log(val)
-    },
     async getEvents() {
       const {status, data} = await this.axios.get("events",{ params: this.getParams()});
       if (status === 200) {
@@ -144,7 +152,10 @@ export default {
           })
         }
       }
-    }
+    },
+    viewEvent(id) {
+      this.$router.push(`/events/${id}`);
+    },
   },
   mounted() {
     this.getEvents();

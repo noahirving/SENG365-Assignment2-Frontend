@@ -1,6 +1,9 @@
 <template>
-  <el-menu :default-active="activeIndex" mode="horizontal" @select="handleSelect">
-    <el-menu-item v-for="(route, index) in routes" :key="index" :index="(index).toString()" @click="$router.push(route.path)">
+  <el-menu :default-active="activeIndex" mode="horizontal">
+    <el-menu-item v-for="(route, index) in routes"
+                  :key="index"
+                  :index="(index).toString()"
+                  @click="$router.push(route.path)">
       {{route.name}}
     </el-menu-item>
   </el-menu>
@@ -25,14 +28,6 @@ export default {
       ]
     }
   },
-  methods: {
-    startHacking() {
-      this.msg = "Start coding with Element Plus with 💖";
-    },
-    handleSelect(key, keyPath) {
-      console.log(key, keyPath);
-    }
-  }
 }
 </script>
 <style>
