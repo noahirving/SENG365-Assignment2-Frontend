@@ -107,7 +107,7 @@ export default {
         const {status, data} = await this.axios.post('users/login', body);
         if (status === 200) {
           const {userId, token} = data;
-          this.setAuth(token);
+          this.setAuth({token, userId});
           this.axios.defaults.headers.common['X-Authorization'] = token;
           this.loginVisisble = false;
           await this.$router.push("/");
@@ -117,9 +117,14 @@ export default {
       }
     },
     async logout() {
+      try {
+        const response = await this.axios.post('users/logout');
+        await this.$router.push("/");
+      } catch (e) {
+        console.log(e);
+      }
       this.removeAuth();
-      //const headers = {'X-Authorization': window.sessionStorage.getItem('token')}
-      const response = await this.axios.post('users/logout');
+      this.axios.defaults.headers.common['X-Authorization'] = null;
     },
     ...mapActions({
       removeAuth: 'removeAuth',

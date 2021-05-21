@@ -2,6 +2,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import Home from '../views/Home.vue'
 import Events from '../views/Events.vue';
 import Event from '../views/Event.vue';
+import Profile from '../views/Profile.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -27,6 +28,11 @@ const routes: Array<RouteRecordRaw> = [
     name: 'Events',
     component: Events
   },
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: Profile
+  }
 
 ]
 

@@ -41,7 +41,7 @@ export default {
         this.event = data;
         await this.getCategories();
         await this.getAttendees();
-        this.organizerImage = (this.axios.defaults.baseURL + `users/${this.event.organizerId}/image`);
+        this.organizerImage = (this.axios.defaults.baseURL + `events/${this.event.organizerId}/image`);
 
         console.log(this.organizerImage)
         await this.getSimilarEvents();
