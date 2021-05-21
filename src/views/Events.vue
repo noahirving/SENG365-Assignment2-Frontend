@@ -19,7 +19,7 @@
         <template #dropdown>
           <el-dropdown-menu>
             <el-dropdown-item v-for="(category, index) in categories" :key="index">
-              <el-checkbox v-model="category.active" >
+              <el-checkbox v-model="category.active">
                 {{category.name}}
               </el-checkbox>
             </el-dropdown-item>

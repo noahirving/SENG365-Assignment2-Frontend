@@ -1,33 +1,13 @@
 <template>
-  <el-menu :default-active="activeIndex" mode="horizontal">
-    <el-menu-item v-for="(route, index) in routes"
-                  :key="index"
-                  :index="(index).toString()"
-                  @click="$router.push(route.path)">
-      {{route.name}}
-    </el-menu-item>
-  </el-menu>
+  <NavBar/>
   <router-view/>
 </template>
 
 <script>
+import NavBar from "@/components/NavBar";
 export default {
   name: "App",
-  data() {
-    return {
-      activeIndex: "0",
-      routes: [
-        {
-          path:"/",
-          name: "Home"
-        },
-        {
-          path: "/events",
-          name: "Events"
-        }
-      ]
-    }
-  },
+  components: {NavBar}
 }
 </script>
 <style>

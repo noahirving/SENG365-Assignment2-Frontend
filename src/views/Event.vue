@@ -2,15 +2,23 @@
   <h1>Event</h1>
   <h2 v-if="event !== null">{{event.title}}</h2>
   <p v-if="event !== null">
-    Date: {{event.date}}<br>
+    Date and Time: {{event.date}}<br>
     Categories: <el-tag type="info" v-for="category in categories" :key="category">{{category}}</el-tag><br>
     Organizer: {{event.organizerFirstName + ' ' + event.organizerLastName}}<br>
     Description: {{event.description}} <br>
     Capacity: {{ event.capacity }}<br>
     Accepted Attendees: {{event.attendeeCount}}<br>
     Attendees: <br><template v-for="attendee in attendees" :key="attendee.attendeeId">{{attendee.firstName + ' ' + attendee.lastName}}<br></template>
+    Similar Events: <template v-for="otherEvent in similarEvents">{{otherEvent.title}}, </template>
   </p>
-  <el-image v-if="event !== null" :src="organizerImage.type + ';base64,' + organizerImage.data"></el-image>
+  <el-image v-if="organizerImage !== null" :src="organizerImage">
+    <template #error>
+      <div class="image-slot">
+        <i class="el-icon-picture-outline"></i>
+      </div>
+
+    </template>
+  </el-image>
 </template>
 
 <script>
@@ -22,10 +30,8 @@ export default {
       event: null,
       categories: [],
       attendees: [],
-      organizerImage: {
-        data: null,
-        type: null
-      },
+      organizerImage: null,
+      similarEvents: []
     }
   },
   methods: {
@@ -35,8 +41,18 @@ export default {
         this.event = data;
         await this.getCategories();
         await this.getAttendees();
-        await this.getOrganizerImage();
+        this.organizerImage = (this.axios.defaults.baseURL + `users/${this.event.organizerId}/image`);
+
+        console.log(this.organizerImage)
+        await this.getSimilarEvents();
       }
+    },
+    async getSimilarEvents() {
+      const {status, data} = await this.axios.get("events",{params:{categoryIds: this.event.categoryIds}});
+      if (status === 200) {
+        this.similarEvents = data;
+      }
+      return this.events;
     },
     async getCategories() {
       const {status, data} = await this.axios.get("events/categories");
@@ -54,16 +70,6 @@ export default {
       if (status === 200) {
         this.attendees = data;
       }
-    },
-    async getOrganizerImage() {
-      console.log(this.event);
-      const response = await this.axios.get(`users/${this.event.organizerId}/image`);
-      if (response.status === 200) {
-        this.organizerImage.data = response.data;
-        this.organizerImage.type = response.headers["content-type"];
-        console.log(this.organizerImage)
-      }
-
     }
   },
   mounted() {
