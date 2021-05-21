@@ -7,16 +7,16 @@
       {{route.name}}
     </el-menu-item>
     <el-menu-item>
-      <Logout/>
+      <Login/>
     </el-menu-item>
   </el-menu>
 </template>
 
 <script>
-import Logout from "@/components/Logout";
+import Login from "@/components/Login";
 export default {
   name: "App",
-  components: {Logout},
+  components: {Login},
   data() {
     return {
       activeIndex: "0",
@@ -28,14 +28,6 @@ export default {
         {
           path: "/events",
           name: "Events"
-        },
-        {
-          path: "/users/register",
-          name: "Register"
-        },
-        {
-          path: "/users/login",
-          name: "Login"
         }
       ]
     }

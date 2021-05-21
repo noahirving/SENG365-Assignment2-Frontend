@@ -12,5 +12,6 @@ app.use(store)
 app.use(router)
 app.use(elementPlus)
 axios.defaults.baseURL = 'http://localhost:4941/api/v1/';
+axios.defaults.headers.common['X-Authorization'] = null;
 app.config.globalProperties.axios = axios;
 app.mount('#app')

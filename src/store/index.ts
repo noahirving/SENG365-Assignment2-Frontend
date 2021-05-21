@@ -2,25 +2,30 @@ import { createStore } from 'vuex'
 
 export default createStore({
   state: {
-    loggedIn: false,
     token: null,
-
   },
   mutations: {
-    set_login(state) {
-      state.loggedIn = !state.loggedIn;
+    set_auth(state, token) {
+      state.token = token
+    },
+    remove_auth(state) {
+      state.token = null;
     }
   },
   actions: {
-    setLogin({commit}) {
-      commit('set_login');
+    setAuth({commit}, token) {
+      commit('set_auth', token);
+    },
+    removeAuth({commit}) {
+      commit('remove_auth');
     }
   },
   getters: {
-    loggedIn(state) {
-      return state.loggedIn || false;
+    getAuth(state) {
+      return state.token;
+    },
+    isLoggedIn(state) {
+      return state.token != null;
     }
-  },
-  modules: {
   }
 })
