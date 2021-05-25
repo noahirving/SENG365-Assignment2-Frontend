@@ -18,9 +18,9 @@
         </el-button>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item v-for="(category, index) in categories" :key="index">
-              <el-checkbox v-model="category.active">
-                {{category.name}}
+            <el-dropdown-item v-for="(category, id) in categories" :key="id">
+              <el-checkbox v-model="activeCategories[id]">
+                {{category}}
               </el-checkbox>
             </el-dropdown-item>
           </el-dropdown-menu>
@@ -30,42 +30,23 @@
 
     <!-- Sort by -->
     <el-col :span="3">
-      <el-select v-model="sortBy" placeholder="Sort by" >
+      <el-select v-model="sortBy" placeholder="Sort by" @change="getEvents">
         <el-option v-for="sort in sortings" :key="sort.key" :label="sort.name" :value="sort.key"></el-option>
       </el-select>
     </el-col>
   </el-row>
 
 
-  <!-- Results -->
-  <el-table
-      :data="events"
-      stripe
-      style="width: 100%">
-    <el-table-column
-        prop="title"
-        label="Title"/>
-    <el-table-column
-      label="Organizer">
-      <template #default="props">
-        {{props.row.organizerFirstName + " " + props.row.organizerLastName}}
-      </template>
-    </el-table-column>
-    <el-table-column
-      prop="numAcceptedAttendees"
-      label="Attendees"/>
-    <el-table-column>
-      <template #default="props">
-        <el-button type="text" @click="viewEvent(props.row.eventId)">View</el-button>
-      </template>
-    </el-table-column>
-  </el-table>
+  Showing {{pageStartIndex + 1}}-{{Math.min(pageEndIndex, events.length)}} of {{totalEvents}}
+  <EventCard v-for="event in eventsPage"
+             :key="event.eventId"
+             :event="event"/>
 
   <!-- Pagination -->
   <el-pagination
       layout="prev, pager, next"
       :page-size="pageSize"
-      :total="50"
+      :total="events.length"
       @current-change="(val) => pageNumber = val"
   />
 
@@ -73,12 +54,17 @@
 </template>
 
 <script>
+import EventCard from "@/components/EventCard";
+import events from "@/api/events";
 export default {
   name: "Events",
+  components: {EventCard},
   data() {
     return {
       events: [],
-      categories: [],
+      eventsPage: [],
+      categories: {},
+      activeCategories: {},
       sortings: [
         {
           name: "A-Z",
@@ -116,24 +102,36 @@ export default {
       q: "",
       sortBy: null,
       pageNumber: 1,
-      pageSize: 10
+      pageSize: 10,
+      totalEvents: 0
     }
   },
   methods: {
     async getEvents() {
+
       const {status, data} = await this.axios.get("events",{ params: this.getParams()});
       if (status === 200) {
         this.events = data;
+        for (const event of this.events) {
+          event.categoryNames = event.categories.map(id => this.categories[id]);
+        }
+        this.totalEvents = this.events.length;
+        //this.pageNumber = 1;
+        this.updatePage();
       }
-      return this.events;
+    },
+    updatePage() {
+      window.scrollTo(0, 0);
+      this.eventsPage = JSON.parse(JSON.stringify(this.events)).splice(this.pageStartIndex, this.pageEndIndex);
+
     },
     getParams() {
       const params = {};
       if (this.q !== "") params.q = this.q;
 
       let categoryIds = [];
-      for (const {id, active} of this.categories){
-        if (active) categoryIds.push(id);
+      for (const id in this.activeCategories){
+        if (this.activeCategories[id]) categoryIds.push(id);
       }
       if (categoryIds.length > 0) params.categoryIds = categoryIds;
 
@@ -141,25 +139,38 @@ export default {
       return params;
     },
     async getCategories() {
-      const {status, data} = await this.axios.get("events/categories");
-      if (status === 200) {
-        this.categories = [];
-        for (const {id, name} of data){
-          this.categories.push({
-            id: id,
-            name: name,
-            active: false
-          })
+      try {
+        const {status, data} = await events.getCategories();
+        this.categories = data;
+        this.activeCategories = {};
+        for (const id in this.categories){
+          this.activeCategories[id] = false;
         }
+      } catch (e) {
+        console.log(e);
       }
     },
-    viewEvent(id) {
-      this.$router.push(`/events/${id}`);
+  },
+  watch: {
+    sortBy: function(){
+      this.getEvents()
     },
+    pageNumber: function() {
+      this.updatePage();
+    }
+
+  },
+  computed: {
+    pageStartIndex() {
+      return (this.pageNumber - 1) * this.pageSize;
+    },
+    pageEndIndex() {
+      return this.pageNumber * this.pageSize;
+    }
   },
   mounted() {
+    this.getCategories();
     this.getEvents();
-    this.getCategories()
   }
 }
 </script>
