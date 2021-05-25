@@ -1,39 +1,45 @@
 <template>
-<el-card v-if="isLoggedIn">
-  <el-button
-      type="primary"
-      @click="editUserVisible = true">
-    Edit User
-  </el-button>
-  {{firstName}}
-  {{lastName}}
-  {{email}}
-  <el-image :src="image">
-    <template #error>
-      <div class="image-slot">
-        <i class="el-icon-picture-outline"></i>
-      </div>
+  <el-card v-if="isLoggedIn">
+    <el-button
+        type="primary"
+        @click="editUserVisible = true">
+      Edit User
+    </el-button>
+    {{firstName}}
+    {{lastName}}
+    {{email}}
+    <el-image :src="image">
+      <template #error>
+        <div class="image-slot">
+          <i class="el-icon-picture-outline"></i>
+        </div>
 
-    </template>
-  </el-image>
-</el-card>
+      </template>
+    </el-image>
+  </el-card>
 
   <!-- Edit Profile Dialog -->
   <el-dialog
       title="Edit Profile"
       v-model="editUserVisible">
     <el-form>
-      <el-form-item label="First Name" :maxlength="labelWidth">
+      <el-form-item label="First Name:" :maxlength="labelWidth">
         <el-input v-model="firstName" :maxlength="inputWidth"/>
       </el-form-item>
-      <el-form-item label="Last Name" :maxlength="labelWidth">
+      <el-form-item label="Last Name:" :maxlength="labelWidth">
         <el-input v-model="lastName" :maxlength="inputWidth"/>
       </el-form-item>
-      <el-form-item label="Email" :maxlength="labelWidth">
+      <el-form-item label="Email:" :maxlength="labelWidth">
         <el-input v-model="email" autocomplete="off" :maxlength="inputWidth"/>
       </el-form-item>
+
+      <!--
       <el-form-item label="Profile Image" :maxlength="labelWidth">
         <el-input type="file" v-model="newImage" autocomplete="off" :maxlength="inputWidth"/>
+      </el-form-item>-->
+
+      <el-form-item label="Profile Image:" :maxlength="labelWidth">
+        <ImageUploader v-on:image="setNewImage"/>
       </el-form-item>
 
     </el-form>
@@ -49,19 +55,23 @@
 <script>
 import {mapGetters} from "vuex";
 import axios from "axios";
+import ImageUploader from "@/components/ImageUploader";
 
 export default {
   name: "Profile",
+  components: {ImageUploader},
   data() {
     return {
       firstName: "",
       lastName: "",
       email: "",
       image: "",
-      newImage: "",
+      newImage: {},
       editUserVisible: false,
       labelWidth: "120px",
-      inputWidth: "260px"
+      inputWidth: "260px",
+      fileReader: new FileReader(),
+      newImageResult: ""
     }
   },
   methods: {
@@ -81,10 +91,31 @@ export default {
         email: this.email
       };
       const {status} = await this.axios.patch(`users/${this.userId}`, body);
-      if (status === 200) {
+
+      let statusImage = 200;
+      if (this.newImage !== {}) {
+
+        const config = {
+          headers:
+              {
+                'Content-Type': this.newImage.type
+              }
+        }
+        const response = await this.axios.put(
+            `users/${this.userId}/image`,
+            this.newImage.src,
+            config
+        );
+        statusImage = response.status;
+      }
+      if (status === 200 && statusImage === 200) {
         this.editUserVisible = false;
         await this.getUser();
       }
+    },
+    setNewImage(image) {
+      this.newImage = image;
+      console.log(this.newImage)
     }
 
   },
