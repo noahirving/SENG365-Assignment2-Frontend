@@ -37,7 +37,7 @@
   </el-row>
 
 
-  Showing {{pageStartIndex + 1}}-{{Math.min(pageEndIndex, events.length)}} of {{totalEvents}}
+  Showing {{Math.min(pageStartIndex + 1, events.length)}}-{{Math.min(pageEndIndex, events.length)}} of {{totalEvents}}
   <EventCard v-for="event in eventsPage"
              :key="event.eventId"
              :event="event"/>
@@ -116,7 +116,6 @@ export default {
           event.categoryNames = event.categories.map(id => this.categories[id]);
         }
         this.totalEvents = this.events.length;
-        //this.pageNumber = 1;
         this.updatePage();
       }
     },
