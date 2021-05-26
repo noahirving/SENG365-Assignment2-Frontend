@@ -1,8 +1,8 @@
 import axios from "@/api/api.ts";
 
 export default {
-    getOne: (userId) => axios.get(`events/${userId}`),
-    getImage: (userId) => axios.get(`events/${userId}/image`),
+    get: (userId) => axios.get(`users/${userId}`),
+    getImage: (userId) => axios.get(`users/${userId}/image`),
     getImagePath: (userId) =>  {
         return axios.defaults.baseURL + `users/${userId}/image`
     },
@@ -25,13 +25,13 @@ export default {
     logout: () => {
         return axios.post('users/logout');
     },
-    edit: (userId, firstName, lastName, email) => {
-        const body = {
-            firstName,
-            lastName,
-            email
-        };
-        return axios.patch(`users/${userId}`, body);
+    edit: (userId, body) => axios.patch(`users/${userId}`, body),
+    editImage: (userId, file) => {
+        const headers = {
+            'Content-type': file.type
+        }
+        return axios.put(`users/${userId}/image`, file, {headers});
     },
-    editImage: (userId, file) => axios.put(`users/${userId}/image`, file)
+    deleteImage: (userId) => axios.delete(`users/${userId}/image`)
+
 }

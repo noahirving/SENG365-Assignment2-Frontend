@@ -1,10 +1,10 @@
 <template>
   <el-card v-if="isLoggedIn">
-    <EditUser/>
+    <EditUser :user="user" v-on:edited="edited"/>
     {{firstName}}
     {{lastName}}
     {{email}}
-    <el-image :src="image">
+    <el-image ref="image" :src="image" :key="imageKey">
       <template #error>
         <div class="image-slot">
           <i class="el-icon-picture-outline"></i>
@@ -21,6 +21,7 @@
 import {mapGetters} from "vuex";
 import axios from "axios";
 import EditUser from "@/components/EditUser";
+import users from '@/api/users';
 
 export default {
   name: "Profile",
@@ -30,17 +31,26 @@ export default {
       firstName: "",
       lastName: "",
       email: "",
-      image: ""
+      image: "",
+      imageKey: 0
     }
   },
   methods: {
+    async edited() {
+      try {
+        this.image = "";
+        await this.getUser();
+      } catch (e) {
+        console.error(e);
+      }
+    },
     async getUser() {
-      const {status, data} = await this.axios.get(`users/${this.userId}`);
+      const {status, data} = await users.get(this.userId);
       if (status === 200) {
         this.firstName = data.firstName;
         this.lastName = data.lastName;
         this.email = data.email;
-        this.image = (this.axios.defaults.baseURL + `users/${this.userId}/image`);
+        this.image = users.getImagePath(this.userId);
       }
     }
   },
@@ -48,10 +58,20 @@ export default {
     ...mapGetters( {
       userId: 'getUserId',
       isLoggedIn: 'isLoggedIn'
-    })
+    }),
+    user() {
+      return {
+        firstName: this.firstName,
+        lastName: this.lastName,
+        email: this.email,
+      }
+    },
   },
   mounted() {
-    if (this.isLoggedIn) this.getUser();
+    if (this.isLoggedIn) {
+      this.getUser();
+    }
+    else this.$router.push('/');
   }
 }
 </script>
