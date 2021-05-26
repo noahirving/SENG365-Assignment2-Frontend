@@ -20,7 +20,7 @@
         <el-input v-model="date" type="datetime-local"/>
       </el-form-item>
       <el-form-item label="Image">
-        <el-input v-model="image"/>
+        <ImageUploader v-on:image="setImage"/>
       </el-form-item>
       <el-form-item label="Description">
         <el-input v-model="description" type="textarea"/>
@@ -55,9 +55,12 @@
 
 <script>
 import events from "@/api/events";
+import ImageUploader from "@/components/ImageUploader";
 
 export default {
   name: "CreateEvent",
+  components: {ImageUploader},
+  emits: ['created'],
   data () {
     return {
       visible: false,
@@ -66,7 +69,7 @@ export default {
       title: "",
       categoryIds: [1],
       date: "",
-      image: "",
+      image: {},
       description: "",
       capacity: 1,
       isOnline: false,
@@ -78,8 +81,12 @@ export default {
   },
   methods: {
     async createEvent() {
+      if (Object.keys(this.image).length === 0) {
+        this.$message.error('Requires an image');
+        return;
+      }
       try {
-        const {status} = await events.create(
+        const {status, data} = await events.create(
             this.title,
             this.description,
             this.categoryIds,
@@ -91,13 +98,18 @@ export default {
             this.requiresAttendanceControl,
             this.fee
         );
+        console.log(data);
 
         if (status === 201) {
+          const response = await events.editImage(data.eventId, this.image.file);
           this.visible = false;
+          this.$emit('created');
           this.$message('Created');
+
         }
       } catch (e) {
         console.error(e);
+        this.$message.error(e.response.statusText);
       }
     },
     updateCapacity() {
@@ -106,6 +118,10 @@ export default {
     updateIsOnline() {
       if (this.isOnline) this.venue = "";
       else this.url = "";
+    },
+    setImage(image) {
+      console.log(image);
+      this.image = image;
     }
   }
 }

@@ -57,7 +57,7 @@ export default {
     },
     async getEvent() {
       try {
-        const {status, data} = await events.getOne(this.id);
+        const {status, data} = await events.get(this.id);
         if (status === 200) {
           this.organizerId = data.organizerId;
           this.organizerImageSrc = users.getImagePath(data.organizerId);

@@ -1,8 +1,18 @@
 import axios from "@/api/api.ts";
 
 export default {
-    getAll: () => axios.get(`events`),
-    getOne: (eventId) => axios.get(`events/${eventId}`),
+    getAll: async () => {
+        const response = await axios.get(`events`);
+        if (response.status !== 200) return response;
+        const events = response.data;
+        const {data} = await this.getCategories();
+        const categories = data;
+        for (const event of events) {
+            event.categoryNames = event.categories.map(id => categories[id]);
+        }
+        return {status: 200, data: events};
+    },
+    get: (eventId) => axios.get(`events/${eventId}`),
     getImage: (eventId) => axios.get(`events/${eventId}/image`),
     getImagePath: (eventId) =>  {
         return axios.defaults.baseURL + `events/${eventId}/image`
@@ -44,5 +54,11 @@ export default {
         };
         console.log(body);
         return axios.post(`events`, body);
-    }
+    },
+    editImage: (eventId, file) => {
+        const headers = {
+            'Content-type': file.type
+        }
+        return axios.put(`events/${eventId}/image`, file, {headers});
+    },
 }

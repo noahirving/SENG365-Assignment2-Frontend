@@ -11,6 +11,8 @@
     Attendees: <br><template v-for="attendee in attendees" :key="attendee.attendeeId">{{attendee.firstName + ' ' + attendee.lastName}}<br></template>
     Similar Events: <template v-for="otherEvent in similarEvents">{{otherEvent.title}}, </template>
   </p>
+  Similar Events:
+  <EventCard v-for="otherEvent in similarEvents" :key="otherEvent.eventId" :event="otherEvent"/>
   <el-image v-if="organizerImage !== null" :src="organizerImage">
     <template #error>
       <div class="image-slot">
@@ -22,8 +24,12 @@
 </template>
 
 <script>
+import EventCard from "@/components/EventCard";
+import events from "@/api/events";
+import users from "@/api/users"
 export default {
   name: "Event",
+  components: {EventCard},
   data() {
     return {
       id: this.$route.params.id,
@@ -36,12 +42,12 @@ export default {
   },
   methods: {
     async getEvent() {
-      const {status, data} = await this.axios.get(`events/${this.id}`);
+      const {status, data} = await events.get(this.id);
       if (status === 200) {
         this.event = data;
         await this.getCategories();
         await this.getAttendees();
-        this.organizerImage = (this.axios.defaults.baseURL + `events/${this.event.organizerId}/image`);
+        this.organizerImage = users.getImagePath(this.event.organizerId);
 
         console.log(this.organizerImage)
         await this.getSimilarEvents();
@@ -55,10 +61,10 @@ export default {
       return this.events;
     },
     async getCategories() {
-      const {status, data} = await this.axios.get("events/categories");
+      const {status, data} = await events.getCategories();
       if (status === 200) {
-        this.categories = [];
-        for (const {id, name} of data){
+        this.eventCategories = [];
+        for (const [id, name] of Object.entries(data)){
           if (id in this.event.categories) {
             this.categories.push(name);
           }

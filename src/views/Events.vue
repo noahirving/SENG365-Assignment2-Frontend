@@ -4,7 +4,7 @@
       <h1>Events</h1>
     </el-col>
     <el-col :span="4">
-      <CreateEvent v-if="$store.state.token !== null"/>
+      <CreateEvent v-if="isLoggedIn" v-on:created="getEvents()"/>
     </el-col>
   </el-row>
   <el-row type="flex" justify="center">
@@ -64,7 +64,7 @@
 import EventCard from "@/components/EventCard";
 import events from "@/api/events";
 import CreateEvent from "@/components/CreateEvent";
-import mapGetters from "vuex/dist/vuex.mjs";
+import {mapGetters} from "vuex";
 export default {
   name: "Events",
   components: {CreateEvent, EventCard},
@@ -117,13 +117,10 @@ export default {
   },
   methods: {
     async getEvents() {
-
+      console.log('get events');
       const {status, data} = await this.axios.get("events",{ params: this.getParams()});
       if (status === 200) {
         this.events = data;
-        for (const event of this.events) {
-          event.categoryNames = event.categories.map(id => this.categories[id]);
-        }
         this.totalEvents = this.events.length;
         this.updatePage();
       }
@@ -175,6 +172,7 @@ export default {
     pageEndIndex() {
       return this.pageNumber * this.pageSize;
     },
+    ...mapGetters(['isLoggedIn'])
   },
   mounted() {
     this.getCategories();
