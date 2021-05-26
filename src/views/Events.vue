@@ -1,5 +1,12 @@
 <template>
-  <h1>Events</h1>
+  <el-row type="flex" justify="center">
+    <el-col :span="12">
+      <h1>Events</h1>
+    </el-col>
+    <el-col :span="4">
+      <CreateEvent v-if="$store.state.token !== null"/>
+    </el-col>
+  </el-row>
   <el-row type="flex" justify="center">
     <!-- Search bar -->
     <el-col :span="12">
@@ -56,9 +63,11 @@
 <script>
 import EventCard from "@/components/EventCard";
 import events from "@/api/events";
+import CreateEvent from "@/components/CreateEvent";
+import mapGetters from "vuex/dist/vuex.mjs";
 export default {
   name: "Events",
-  components: {EventCard},
+  components: {CreateEvent, EventCard},
   data() {
     return {
       events: [],
@@ -165,7 +174,7 @@ export default {
     },
     pageEndIndex() {
       return this.pageNumber * this.pageSize;
-    }
+    },
   },
   mounted() {
     this.getCategories();

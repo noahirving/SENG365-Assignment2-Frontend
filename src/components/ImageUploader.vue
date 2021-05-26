@@ -14,6 +14,7 @@
 <script>
 export default {
   name: "ImageUploader",
+  emits: ["image"],
   data() {
     return {
       labelWidth: 200,
@@ -22,7 +23,9 @@ export default {
         src: "",
         type: "",
         name: "",
+        file: "",
       },
+      file: "",
       acceptedTypes: [
           'image/png',
           'image/jpeg',
@@ -42,10 +45,8 @@ export default {
 
       reader.onload = this.updateImage;
       if (file) {
-        this.image.type = file.type;
-        this.image.name = file.name;
+        this.image.file = file;
         reader.readAsDataURL(file);
-        //reader.readAsArrayBuffer(file);
       }
     },
     updateImage(e) {

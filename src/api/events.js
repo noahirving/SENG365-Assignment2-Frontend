@@ -17,5 +17,32 @@ export default {
         response.data = categories;
         return response;
 
+    },
+    create: (
+        title,
+         description,
+         categoryIds,
+         date,
+         isOnline,
+         url,
+         venue,
+         capacity,
+         requiresAttendanceControl,
+         fee
+    ) => {
+        const body = {
+            title,
+            description,
+            categoryIds,
+            date,
+            isOnline,
+            url,
+            venue,
+            capacity,
+            requiresAttendanceControl,
+            fee,
+        };
+        console.log(body);
+        return axios.post(`events`, body);
     }
 }

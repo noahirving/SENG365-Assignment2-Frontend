@@ -1,10 +1,6 @@
 <template>
   <el-card v-if="isLoggedIn">
-    <el-button
-        type="primary"
-        @click="editUserVisible = true">
-      Edit User
-    </el-button>
+    <EditUser/>
     {{firstName}}
     {{lastName}}
     {{email}}
@@ -18,60 +14,23 @@
     </el-image>
   </el-card>
 
-  <!-- Edit Profile Dialog -->
-  <el-dialog
-      title="Edit Profile"
-      v-model="editUserVisible">
-    <el-form>
-      <el-form-item label="First Name:" :maxlength="labelWidth">
-        <el-input v-model="firstName" :maxlength="inputWidth"/>
-      </el-form-item>
-      <el-form-item label="Last Name:" :maxlength="labelWidth">
-        <el-input v-model="lastName" :maxlength="inputWidth"/>
-      </el-form-item>
-      <el-form-item label="Email:" :maxlength="labelWidth">
-        <el-input v-model="email" autocomplete="off" :maxlength="inputWidth"/>
-      </el-form-item>
 
-      <!--
-      <el-form-item label="Profile Image" :maxlength="labelWidth">
-        <el-input type="file" v-model="newImage" autocomplete="off" :maxlength="inputWidth"/>
-      </el-form-item>-->
-
-      <el-form-item label="Profile Image:" :maxlength="labelWidth">
-        <ImageUploader v-on:image="setNewImage"/>
-      </el-form-item>
-
-    </el-form>
-    <template #footer>
-    <span class="dialog-footer">
-      <el-button @click="editUserVisible = false">Cancel</el-button>
-      <el-button type="primary" @click="updateUser()">Save</el-button>
-    </span>
-    </template>
-  </el-dialog>
 </template>
 
 <script>
 import {mapGetters} from "vuex";
 import axios from "axios";
-import ImageUploader from "@/components/ImageUploader";
+import EditUser from "@/components/EditUser";
 
 export default {
   name: "Profile",
-  components: {ImageUploader},
+  components: {EditUser},
   data() {
     return {
       firstName: "",
       lastName: "",
       email: "",
-      image: "",
-      newImage: {},
-      editUserVisible: false,
-      labelWidth: "120px",
-      inputWidth: "260px",
-      fileReader: new FileReader(),
-      newImageResult: ""
+      image: ""
     }
   },
   methods: {
@@ -83,41 +42,7 @@ export default {
         this.email = data.email;
         this.image = (this.axios.defaults.baseURL + `users/${this.userId}/image`);
       }
-    },
-    async updateUser() {
-      const body = {
-        firstName: this.firstName,
-        lastName: this.lastName,
-        email: this.email
-      };
-      const {status} = await this.axios.patch(`users/${this.userId}`, body);
-
-      let statusImage = 200;
-      if (this.newImage !== {}) {
-
-        const config = {
-          headers:
-              {
-                'Content-Type': this.newImage.type
-              }
-        }
-        const response = await this.axios.put(
-            `users/${this.userId}/image`,
-            this.newImage.src,
-            config
-        );
-        statusImage = response.status;
-      }
-      if (status === 200 && statusImage === 200) {
-        this.editUserVisible = false;
-        await this.getUser();
-      }
-    },
-    setNewImage(image) {
-      this.newImage = image;
-      console.log(this.newImage)
     }
-
   },
   computed: {
     ...mapGetters( {

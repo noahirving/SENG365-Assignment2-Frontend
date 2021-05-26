@@ -2,14 +2,14 @@
   <!-- Buttons -->
   <el-button type="primary" v-if="isLoggedIn" @click="logout">Logout</el-button>
   <template v-if="!isLoggedIn">
-    <el-button type="primary" @click="loginVisisble = true">Login</el-button>
+    <el-button type="primary" @click="loginVisible = true">Login</el-button>
     <el-button type="info" @click="registerVisible = true">Register</el-button>
   </template>
 
   <!-- Login dialog -->
   <el-dialog
     title="Login"
-    v-model="loginVisisble">
+    v-model="loginVisible">
     <el-form :model="loginForm">
       <el-form-item label="Email" :label-width="labelWidth">
         <el-input v-model="loginForm.email" autocomplete="off" :maxlength="inputWidth"/>
@@ -20,7 +20,7 @@
     </el-form>
     <template #footer>
     <span class="dialog-footer">
-      <el-button @click="loginVisisble = false">Cancel</el-button>
+      <el-button @click="loginVisible = false">Cancel</el-button>
       <el-button type="primary" @click="login()">Login</el-button>
     </span>
     </template>
@@ -55,12 +55,13 @@
 
 <script>
 import {mapActions, mapGetters} from "vuex/dist/vuex.mjs";
+import users from "@/api/users";
 
 export default {
   name: "Login",
   data() {
     return {
-      loginVisisble: false,
+      loginVisible: false,
       loginForm: {
         email: "",
         password: ""
@@ -78,14 +79,13 @@ export default {
   },
   methods: {
     async register() {
-      const body = {
-        "firstName": this.registerForm.firstName,
-        "lastName": this.registerForm.lastName,
-        "email": this.registerForm.email,
-        "password": this.registerForm.password
-      }
       try {
-        const response = await this.axios.post('users/register', body);
+        const response = await users.register(
+            this.registerForm.firstName,
+            this.registerForm.lastName,
+            this.registerForm.email,
+            this.registerForm.password
+        )
         if (response.status === 201) {
           this.registerVisible = false;
           this.loginForm.email = this.registerForm.email;
@@ -100,16 +100,12 @@ export default {
     },
     async login() {
       try {
-        const body = {
-          "email": this.loginForm.email,
-          "password": this.loginForm.password
-        };
-        const {status, data} = await this.axios.post('users/login', body);
+        const {status, data} = await users.login(this.loginForm.email, this.loginForm.password);
         if (status === 200) {
           const {userId, token} = data;
           this.setAuth({token, userId});
           this.axios.defaults.headers.common['X-Authorization'] = token;
-          this.loginVisisble = false;
+          this.loginVisible = false;
           await this.$router.push("/");
         }
       } catch (e) {
@@ -118,7 +114,7 @@ export default {
     },
     async logout() {
       try {
-        const response = await this.axios.post('users/logout');
+        const response = await users.logout();
         await this.$router.push("/");
       } catch (e) {
         console.log(e);
