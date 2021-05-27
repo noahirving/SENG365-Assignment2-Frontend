@@ -1,12 +1,10 @@
 <template>
-  <input type="file" :onchange="previewFile" autocomplete="off" :maxlength="inputWidth" :accept="acceptedTypes"/>
+  <input ref="input" type="file" :onchange="previewFile" autocomplete="off" :maxlength="inputWidth" :accept="acceptedTypes"/>
+  <el-button type="danger" @click="deleteImage">Delete Image</el-button>
+  <br>
 
-  <el-image ref="image" :src="image.src" height="200" alt="Image preview...">
-    <template #error>
-      <div class="image-slot">
-        <i class="el-icon-picture-outline"></i>
-      </div>
-    </template>
+  <el-image v-if="image.src !== ''" ref="image" :src="image.src" height="200" alt="Image preview...">
+    <template #error>No Image</template>
   </el-image>
 
 </template>
@@ -14,6 +12,9 @@
 <script>
 export default {
   name: "ImageUploader",
+  props: {
+    currentImageSrc: String
+  },
   emits: ["image"],
   data() {
     return {
@@ -21,9 +22,7 @@ export default {
       inputWidth:200,
       image: {
         src: "",
-        type: "",
-        name: "",
-        file: "",
+        file: null,
       },
       file: "",
       acceptedTypes: [
@@ -52,7 +51,25 @@ export default {
     updateImage(e) {
       this.image.src = e.target.result;
       this.$emit("image", this.image);
+    },
+    setCurrentImage() {
+      if (this.currentImageSrc !== undefined) {
+        this.image.src = this.currentImageSrc;
+        console.log(this.image.src)
+      }
+    },
+    deleteImage() {
+      this.image = {
+        src: "",
+        file: null,
+      }
+      this.$refs.input.value = '';
+      this.$emit("image", this.image);
     }
+  },
+  mounted() {
+    console.log(this.currentImageSrc)
+    this.setCurrentImage();
 
   }
 }
