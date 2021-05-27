@@ -31,8 +31,7 @@ export default {
     selectedCategories() {
       const selected = [];
       for (const [id, active] of Object.entries(this.activeCategories)) {
-        console.log(id, active)
-        if (active) selected.push(id);
+        if (active) selected.push(parseInt(id));
       }
       return selected;
     }

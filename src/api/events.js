@@ -13,7 +13,16 @@ export default {
         }
         return {status: 200, data: events};
     },
-    get: (eventId) => axios.get(`events/${eventId}`),
+    get: async (eventId) => {
+        const response = await axios.get(`events/${eventId}`);
+        if (response.status !== 200) return response;
+        const event = response.data;
+        const {data} = await getCategories();
+        const categories = data;
+        event.categoryNames = event.categories.map(id => categories[id]);
+
+        return {status: 200, data: event};
+    },
     getImage: (eventId) => axios.get(`events/${eventId}/image`),
     getImagePath: (eventId) =>  {
         return axios.defaults.baseURL + `events/${eventId}/image`
@@ -52,6 +61,7 @@ export default {
         }
         return axios.put(`events/${eventId}/image`, file, {headers});
     },
+    delete: (eventId) => axios.delete(`events/${eventId}`),
 }
 async function getCategories() {
     const response = await axios.get(`events/categories`);

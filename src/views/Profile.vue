@@ -12,6 +12,8 @@
 
       </template>
     </el-image>
+
+    <MyEvents :user-id="userId"/>
   </el-card>
 
 
@@ -19,13 +21,13 @@
 
 <script>
 import {mapGetters} from "vuex";
-import axios from "axios";
 import EditUser from "@/components/EditUser";
 import users from '@/api/users';
+import MyEvents from "@/components/MyEvents";
 
 export default {
   name: "Profile",
-  components: {EditUser},
+  components: {MyEvents, EditUser},
   data() {
     return {
       firstName: "",

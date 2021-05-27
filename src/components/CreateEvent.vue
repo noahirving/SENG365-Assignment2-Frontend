@@ -28,6 +28,9 @@
       <el-form-item label="Capacity">
         <el-input-number v-model="capacity" @change="updateCapacity" :max="Infinity + 1"/>
       </el-form-item>
+      <el-form-item label="Categories">
+        <CategorySelector v-on:updated="updateCategoryIds"/>
+      </el-form-item>
       <el-form-item label="Is Online">
         <el-checkbox v-model="isOnline" type="checkbox" @change="updateIsOnline"/>
       </el-form-item>
@@ -56,10 +59,11 @@
 <script>
 import events from "@/api/events";
 import ImageUploader from "@/components/ImageUploader";
+import CategorySelector from "@/components/CategorySelector";
 
 export default {
   name: "CreateEvent",
-  components: {ImageUploader},
+  components: {CategorySelector, ImageUploader},
   emits: ['created'],
   data () {
     return {
@@ -67,7 +71,7 @@ export default {
 
 
       title: "",
-      categoryIds: [1],
+      categoryIds: [],
       date: "",
       image: {},
       description: "",
@@ -80,6 +84,9 @@ export default {
     }
   },
   methods: {
+    updateCategoryIds(ids) {
+      this.categoryIds = ids;
+    },
     async createEvent() {
       if (Object.keys(this.image).length === 0) {
         this.$message.error('Requires an image');
