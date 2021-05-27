@@ -1,17 +1,39 @@
-<template>
-  <el-card v-if="isLoggedIn">
-    <EditUser :user="user" v-on:edited="edited"/>
-    {{firstName}}
-    {{lastName}}
-    {{email}}
-    <el-image ref="image" :src="image" :key="imageKey">
-      <template #error>
-        <i class="el-icon-user" style="font-size: 100px"/>
-      </template>
-    </el-image>
-
-    <MyEvents :user-id="userId"/>
-  </el-card>
+<template v-if="user">
+  <el-row>
+    <el-col :span="16" :offset="4">
+      <el-container>
+        <el-header>
+          <h2>Profile</h2>
+          <el-divider/>
+        </el-header>
+        <el-container>
+        <el-aside style="width: 600px; height: 600px">
+          <el-image ref="image" :src="image" :key="imageKey" style="width: 100%; height: 90%" fit="cover">
+            <template #error>
+              <i class="el-icon-user" style="font-size: 600px"/>
+            </template>
+          </el-image>
+        </el-aside>
+        <el-main>
+          <el-descriptions direction="vertical" :column="1">
+            <el-descriptions-item>
+              <EditUser :user="user" v-on:edited="edited"/>
+            </el-descriptions-item>
+            <el-descriptions-item label="First name:">{{firstName}}</el-descriptions-item>
+            <el-descriptions-item label="Last name:">{{lastName}}</el-descriptions-item>
+            <el-descriptions-item label="Email:">{{email}}</el-descriptions-item>
+          </el-descriptions>
+        </el-main>
+        </el-container>
+      </el-container>
+    </el-col>
+  </el-row>
+  <el-row>
+    <el-col>
+      <el-divider/>
+      <MyEvents :user-id="userId"/>
+    </el-col>
+  </el-row>
 
 
 </template>
