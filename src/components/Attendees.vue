@@ -96,7 +96,6 @@ export default {
     },
   },
   mounted() {
-    console.log('bool', this.organizer)
     if (this.organizer !== undefined) this.isOrganizer = this.organizer;
     this.getAttendees();
   }

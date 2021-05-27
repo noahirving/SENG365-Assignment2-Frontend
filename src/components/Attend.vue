@@ -1,6 +1,6 @@
 <template>
-  <el-button v-if="!isAttending" type="success" @click="attend">Attend</el-button>
-  <el-button v-else type="danger" @click="removeAttendance">Remove attendance</el-button>
+  <el-button v-if="isAttending" type="danger" @click="removeAttendance">Remove attendance</el-button>
+  <el-button v-else type="success" @click="attend">Attend</el-button>
 </template>
 
 <script>
@@ -15,17 +15,16 @@ export default {
   emits: ['updated'],
   data() {
     return {
-      isAttending: false
+      isAttending: false,
     }
   },
   methods: {
     async attend() {
       try {
         await attendees.create(this.eventId);
-        this.isAttending = true;
+        await this.getAttendance();
         this.$message.success("Attending event");
         this.$emit('updated');
-
       } catch (e) {
         console.log(e)
         this.$message.error(e.response.statusText);
@@ -34,7 +33,7 @@ export default {
     async removeAttendance() {
       try {
         await attendees.delete(this.eventId);
-        this.isAttending = false;
+        await this.getAttendance();
         this.$message.success("Removed attendance");
         this.$emit('updated');
       } catch (e) {
@@ -46,6 +45,7 @@ export default {
       try {
         const {data} = await attendees.get(this.eventId);
 
+        this.isAttending = false;
         for (const attendee of data) {
           if (attendee.attendeeId == this.userId) {
             this.isAttending = true;
@@ -55,7 +55,6 @@ export default {
       } catch (e) {
         console.error(e);
       }
-
     }
   },
   computed: {

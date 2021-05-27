@@ -71,7 +71,6 @@ export default {
   },
   methods: {
     async viewEvent() {
-      console.log(`/events/${this.id}`)
       await this.$router.push(`/events/${this.id}`);
       this.$emit('viewed');
     },
