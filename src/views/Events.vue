@@ -41,7 +41,7 @@
       layout="prev, pager, next"
       :page-size="pageSize"
       :total="events.length"
-      @current-change="(val) => pageNumber = val"
+      @current-change="pageChange"
   />
 
 
@@ -99,6 +99,8 @@ export default {
       sortBy: null,
       pageNumber: 1,
       pageSize: 10,
+      pageStartIndex: 0,
+      pageEndIndex: 0,
       totalEvents: 0
     }
   },
@@ -115,10 +117,17 @@ export default {
         this.updatePage();
       }
     },
+    pageChange(val) {
+      this.pageNumber = val;
+      this.updatePage();
+    },
     updatePage() {
       window.scrollTo(0, 0);
-      this.eventsPage = JSON.parse(JSON.stringify(this.events)).splice(this.pageStartIndex, this.pageEndIndex);
-
+      this.pageStartIndex = (this.pageNumber - 1) * this.pageSize;
+      this.pageEndIndex = this.pageNumber * this.pageSize;
+      console.log(this.pageStartIndex, this.pageEndIndex)
+      this.eventsPage = JSON.parse(JSON.stringify(this.events)).slice(this.pageStartIndex, this.pageEndIndex);
+      console.log(this.eventsPage)
     },
     getParams() {
       const params = {};
@@ -140,12 +149,6 @@ export default {
 
   },
   computed: {
-    pageStartIndex() {
-      return (this.pageNumber - 1) * this.pageSize;
-    },
-    pageEndIndex() {
-      return this.pageNumber * this.pageSize;
-    },
     ...mapGetters(['isLoggedIn'])
   },
   mounted() {
