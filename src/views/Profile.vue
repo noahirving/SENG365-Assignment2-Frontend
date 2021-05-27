@@ -6,9 +6,7 @@
     {{email}}
     <el-image ref="image" :src="image" :key="imageKey">
       <template #error>
-        <div class="image-slot">
-          <i class="el-icon-picture-outline"></i>
-        </div>
+          <i class="el-icon-picture-outline"/>
 
       </template>
     </el-image>

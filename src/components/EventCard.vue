@@ -3,22 +3,39 @@
     <el-card style="width: 90%; margin: auto; margin-bottom: 10px" >
       <el-container>
         <el-aside>
-          <el-image :src="imageSrc"/>
+          <el-image :src="imageSrc" style="width: 300px; height: 300px;" fit="cover">
+            <template #error>
+              <i class="el-icon-picture-outline"/>
+            </template>
+          </el-image>
         </el-aside>
         <el-container>
           <el-header>
-            {{title}}
+            <h2>{{title}}</h2>
           </el-header>
           <el-main id="content">
+            <el-container>
+              <el-aside width="60%">
+                Date: {{date}},
+                Time: {{time}} <br>
+                Attendees: {{numAcceptedAttendees}}
+                <el-container>Categories: <el-tag v-for="category in event.categoryNames" :key="category">{{ category }}</el-tag></el-container>
 
-            Host: {{organizer}}
-            <el-container><el-image :src="organizerImageSrc"></el-image></el-container>
+              </el-aside>
+              <el-main>
 
-            Date: {{date}},
-            Time: {{time}} <br>
-            Attendees: {{numAcceptedAttendees}}
-            <el-container>Categories: <el-tag v-for="category in event.categoryNames" :key="category">{{ category }}</el-tag></el-container>
-          </el-main>
+                Host: {{organizer}} <br>
+                <el-image :src="organizerImageSrc"
+                          style="width: 100px; height: 100px"
+                          fit="cover">
+                  <template #error>
+                    <i class="el-icon-picture-outline"/>
+                  </template>
+                </el-image>
+              </el-main>
+            </el-container>
+
+            </el-main>
           <el-footer>
             <el-button @click="viewEvent">View</el-button>
           </el-footer>

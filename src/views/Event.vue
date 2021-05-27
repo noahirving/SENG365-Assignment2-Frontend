@@ -1,28 +1,59 @@
 <template>
-  <h1>Event</h1>
-  <h2 v-if="event !== null">{{event.title}}</h2> <DeleteEvent v-if="isEventOwner" :id="id"/>
-  <p v-if="event !== null">
-    Date and Time: {{event.date}}<br>
-    Categories: <el-tag v-for="category in event.categoryNames" :key="category">{{ category }}</el-tag><br>
-    Organizer: {{event.organizerFirstName + ' ' + event.organizerLastName}}<br>
-  </p>
-  <el-image v-if="organizerImage !== null" :src="organizerImage">
-    <template #error>
-      <div class="image-slot">
-        <i class="el-icon-picture-outline"></i>
-      </div>
+  <el-row v-if="event != null && event.title != null">
+    <el-col :span="16" :offset="4">
+      <el-container>
+        <el-divider/>
+        <el-header>
+          <h1>{{event.title}}
+            <DeleteEvent v-if="isEventOwner" :id="id"/>
+          </h1>
+        </el-header>
+        <el-divider/>
+        <el-container>
+          <el-aside style="width: 600px">
+            <el-image :src="image.src"
+                      style="width: 600px; height: 600px"
+                      fit="cover">
+              <template #error>
+                <i class="el-icon-picture-outline"></i>
+              </template>
+            </el-image>
+          </el-aside>
+          <el-main>
+            <el-descriptions direction="vertical" :column="1">
+              <el-descriptions-item label="Date and time:">{{dateTime}}</el-descriptions-item>
+              <el-descriptions-item label="Categories:"><el-tag v-for="category in event.categoryNames" :key="category">{{ category }}</el-tag></el-descriptions-item>
+              <el-descriptions-item label="Organizer:">
+                {{event.organizerFirstName + ' ' + event.organizerLastName}}<br>
+                <el-image :src="organizerImage"
+                          style="width: 100px; height: 100px"
+                          fit="cover">
+                  <template #error>
+                    <i class="el-icon-picture-outline"></i>
+                  </template>
+                </el-image>
+              </el-descriptions-item>
+              <el-descriptions-item label="Description:">{{event.description}}</el-descriptions-item>
+              <el-descriptions-item label="Capacity:">{{event.capacity}}</el-descriptions-item>
+              <el-descriptions-item label="Accepted Attendees:">{{event.attendeeCount}}</el-descriptions-item>
+            </el-descriptions>
+          </el-main>
+        </el-container>
+      </el-container>
+    </el-col>
+  </el-row>
 
-    </template>
-  </el-image>
-  <p v-if="event !== null">
-    Description: {{event.description}} <br>
-    Capacity: {{ event.capacity }}<br>
-    Accepted Attendees: {{event.attendeeCount}}<br>
-    Attendees: <br><template v-for="attendee in attendees" :key="attendee.attendeeId">{{attendee.firstName + ' ' + attendee.lastName}}<br></template>
-    Similar Events: <template v-for="otherEvent in similarEvents">{{otherEvent.title}}, </template>
-  </p>
-  Similar Events:
-  <EventCard v-for="otherEvent in similarEvents" :key="otherEvent.eventId" :event="otherEvent"/>
+
+  <Attendees :event-id="id" :organizer="isEventOwner" v-on:updated="getEvent"/>
+  <el-row>
+    <el-container>
+      <el-header>
+        <h2>Similar events:</h2>
+      </el-header>
+      <el-divider/>
+      <EventCard v-for="otherEvent in similarEvents" :key="otherEvent.eventId" :event="otherEvent"/>
+    </el-container>
+  </el-row>
 </template>
 
 <script>
@@ -31,14 +62,20 @@ import events from "@/api/events";
 import users from "@/api/users"
 import DeleteEvent from "@/components/DeleteEvent";
 import {mapState} from "vuex";
+import Attendees from "@/components/Attendees";
 export default {
   name: "Event",
-  components: {DeleteEvent, EventCard},
+  components: {Attendees, DeleteEvent, EventCard},
   data() {
     return {
       event: null,
+      dateTime: "",
       categories: [],
       attendees: [],
+      image: {
+        src: "",
+        file: null,
+      },
       organizerImage: null,
       organizerId: null,
       similarEvents: []
@@ -47,17 +84,14 @@ export default {
   methods: {
     async getEvent() {
       try {
-        const {status, data} = await events.get(this.id);
-        console.log(status, data);
-        if (status === 200) {
-          this.event = data;
-          await this.getAttendees();
-          this.organizerId = this.event.organizerId;
-          this.organizerImage = users.getImagePath(this.organizerId);
+        const {data} = await events.get(this.id);
+        this.event = data;
+        const dateTime = new Date(this.event.date);
+        this.dateTime = dateTime.toLocaleDateString() + ', ' + dateTime.toLocaleTimeString();
+        this.image.src = events.getImagePath(this.id);
+        this.organizerId = this.event.organizerId;
+        this.organizerImage = users.getImagePath(this.organizerId);
 
-          console.log(this.organizerImage)
-          await this.getSimilarEvents();
-        }
       } catch (e) {
         console.error(e);
       }
@@ -80,12 +114,11 @@ export default {
         console.error(e);
       }
     },
-    async getAttendees() {
-      const {status, data} = await this.axios.get(`events/${this.id}/attendees`);
-      if (status === 200) {
-        this.attendees = data;
-      }
-    },
+    async setup() {
+      await this.getEvent();
+      await this.getSimilarEvents();
+
+    }
   },
   computed: {
     id() {
@@ -104,7 +137,7 @@ export default {
     }
   },
   mounted() {
-    this.getEvent();
+    this.setup();
   }
 }
 </script>
