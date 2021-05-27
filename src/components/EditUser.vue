@@ -84,6 +84,11 @@ export default {
       password: ""
     }
   },
+  watch: {
+    tab() {
+      this.open();
+    }
+  },
   methods: {
     getBody() {
       const body = {
@@ -149,9 +154,6 @@ export default {
   },
   computed: {
     ...mapState(['userId']),
-    currentImage() {
-      return users.getImagePath(this.userId);
-    }
   },
 }
 </script>
