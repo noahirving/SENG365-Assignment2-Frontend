@@ -44,6 +44,7 @@
               <el-descriptions-item label="Accepted Attendees:">{{event.attendeeCount}}</el-descriptions-item>
               <el-descriptions-item v-if="event.isOnline" label="URL:"><a :href="event.url">{{event.url}}</a></el-descriptions-item>
               <el-descriptions-item v-else label="Venue:">{{event.venue}}</el-descriptions-item>
+              <el-descriptions-item label="Fee:">${{event.fee}}</el-descriptions-item>
             </el-descriptions>
           </el-main>
         </el-container>
