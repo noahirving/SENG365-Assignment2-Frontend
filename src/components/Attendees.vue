@@ -7,6 +7,15 @@
   <el-row>
   <el-col :span="20" :offset="2">
   <el-table v-if="attendees.length !== 0" :data="attendees">
+    <el-table-column label="Profile image">
+      <template #default="scope">
+        <el-image :src="getImage(scope.row)" style="width: 50px; height: 50px" fit="cover">
+          <template #error>
+            <i class="el-icon-user" style="font-size: 50px"/>
+          </template>
+        </el-image>
+      </template>
+    </el-table-column>
     <el-table-column prop="firstName" label="First name"/>
     <el-table-column prop="lastName" label="Last name"/>
     <el-table-column label="Date of interest">
@@ -44,6 +53,7 @@
 
 <script>
 import attendees from "@/api/attendees";
+import users from '@/api/users';
 export default {
   name: "Attendees",
   props: {
@@ -70,6 +80,9 @@ export default {
       const date = new Date(attendee.dateOfInterest);
       return date.toLocaleTimeString() + ', ' + date.toLocaleDateString();
     },
+    getImage(attendee) {
+      return users.getImagePath(attendee.attendeeId);
+    },
     async updateAttendee(attendee, status) {
       try {
         await attendees.edit(this.eventId, attendee.attendeeId, status);
@@ -80,7 +93,7 @@ export default {
         console.error(e);
         this.$message.error(e.response.statusText);
       }
-    }
+    },
   },
   mounted() {
     console.log('bool', this.organizer)

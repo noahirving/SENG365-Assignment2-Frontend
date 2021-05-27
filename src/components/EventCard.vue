@@ -5,7 +5,7 @@
         <el-aside>
           <el-image :src="imageSrc" style="width: 300px; height: 300px;" fit="cover">
             <template #error>
-              <i class="el-icon-picture-outline"/>
+              <i class="el-icon-picture-outline" style="font-size: 300px"/>
             </template>
           </el-image>
         </el-aside>
@@ -29,7 +29,7 @@
                           style="width: 100px; height: 100px"
                           fit="cover">
                   <template #error>
-                    <i class="el-icon-picture-outline"/>
+                    <i class="el-icon-user" style="font-size: 100px"/>
                   </template>
                 </el-image>
               </el-main>
@@ -55,6 +55,7 @@ export default {
     event: Object,
     eventCategories: Array
   },
+  emits: ['viewed'],
   data () {
     return {
       id: this.event.eventId,
@@ -72,6 +73,7 @@ export default {
     async viewEvent() {
       console.log(`/events/${this.id}`)
       await this.$router.push(`/events/${this.id}`);
+      this.$emit('viewed');
     },
     async getEvent() {
       try {

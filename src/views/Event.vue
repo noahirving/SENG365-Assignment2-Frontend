@@ -1,4 +1,4 @@
-<template>
+<template :key="pageKey">
   <el-row v-if="event != null && event.title != null">
     <el-col :span="16" :offset="4">
       <el-container>
@@ -18,12 +18,15 @@
                       style="width: 600px; height: 600px"
                       fit="cover">
               <template #error>
-                <i class="el-icon-picture-outline"></i>
+                <i class="el-icon-picture-outline" style="font-size: 600px"/>
               </template>
             </el-image>
           </el-aside>
           <el-main>
             <el-descriptions direction="vertical" :column="1">
+              <el-descriptions-item v-if="isLoggedIn">
+                <Attend :event-id="id" v-on:updated="attendanceUpdated"/>
+              </el-descriptions-item>
               <el-descriptions-item label="Date and time:">{{dateTime}}</el-descriptions-item>
               <el-descriptions-item label="Categories:"><el-tag v-for="category in event.categoryNames" :key="category">{{ category }}</el-tag></el-descriptions-item>
               <el-descriptions-item label="Organizer:">
@@ -32,13 +35,15 @@
                           style="width: 100px; height: 100px"
                           fit="cover">
                   <template #error>
-                    <i class="el-icon-picture-outline"></i>
+                    <i class="el-icon-user" style="font-size: 100px"/>
                   </template>
                 </el-image>
               </el-descriptions-item>
               <el-descriptions-item label="Description:">{{event.description}}</el-descriptions-item>
               <el-descriptions-item label="Capacity:">{{event.capacity}}</el-descriptions-item>
               <el-descriptions-item label="Accepted Attendees:">{{event.attendeeCount}}</el-descriptions-item>
+              <el-descriptions-item v-if="event.isOnline" label="URL:"><a :href="event.url">{{event.url}}</a></el-descriptions-item>
+              <el-descriptions-item v-else label="Venue:">{{event.venue}}</el-descriptions-item>
             </el-descriptions>
           </el-main>
         </el-container>
@@ -47,14 +52,14 @@
   </el-row>
 
 
-  <Attendees :event-id="id" :organizer="isEventOwner" v-on:updated="getEvent"/>
+  <Attendees :event-id="id" :organizer="isEventOwner" v-on:updated="getEvent" :key="attendeesKey"/>
   <el-row>
     <el-container>
       <el-header>
         <h2>Similar events:</h2>
       </el-header>
       <el-divider/>
-      <EventCard v-for="otherEvent in similarEvents" :key="otherEvent.eventId" :event="otherEvent"/>
+      <EventCard v-for="otherEvent in similarEvents" :key="otherEvent.eventId" :event="otherEvent" v-on:viewed="viewedEvent"/>
     </el-container>
   </el-row>
 </template>
@@ -64,12 +69,13 @@ import EventCard from "@/components/EventCard";
 import events from "@/api/events";
 import users from "@/api/users"
 import DeleteEvent from "@/components/DeleteEvent";
-import {mapState} from "vuex";
+import {mapGetters, mapState} from "vuex";
 import Attendees from "@/components/Attendees";
 import EditEvent from "@/components/EditEvent"
+import Attend from "@/components/Attend";
 export default {
   name: "Event",
-  components: {Attendees, DeleteEvent, EventCard, EditEvent},
+  components: {Attend, Attendees, DeleteEvent, EventCard, EditEvent},
   data() {
     return {
       event: null,
@@ -82,7 +88,10 @@ export default {
       },
       organizerImage: null,
       organizerId: null,
-      similarEvents: []
+      similarEvents: [],
+
+      attendeesKey: 0,
+      pageKey: 0
     }
   },
   methods: {
@@ -122,6 +131,15 @@ export default {
       this.image.src = "";
       await this.getEvent();
     },
+    attendanceUpdated() {
+      this.attendeesKey += 1;
+    },
+    async viewedEvent() {
+      await this.setup()
+      this.pageKey++;
+      window.scrollTo(0, 0);
+
+    },
     async setup() {
       await this.getEvent();
       await this.getSimilarEvents();
@@ -135,6 +153,7 @@ export default {
     ...mapState({
       userId: 'userId'
     }),
+    ...mapGetters(['isLoggedIn']),
     isEventOwner() {
       return this.userId === this.organizerId;
     }

@@ -6,8 +6,7 @@
     {{email}}
     <el-image ref="image" :src="image" :key="imageKey">
       <template #error>
-          <i class="el-icon-picture-outline"/>
-
+        <i class="el-icon-user" style="font-size: 100px"/>
       </template>
     </el-image>
 

@@ -6,6 +6,7 @@
 <script>
 import EventCard from "@/components/EventCard";
 import events from "@/api/events";
+import attendees from "@/api/attendees";
 export default {
   name: "MyEvents",
   components: {EventCard},
@@ -25,6 +26,15 @@ export default {
           const {data} = await events.get(event.eventId);
           if (data.organizerId === this.userId) {
             this.myEvents.push(event);
+            break;
+          } else {
+            const {data} = await attendees.get(event.eventId);
+            for (const attendee of data) {
+              if (attendee.attendeeId == this.userId) {
+                this.myEvents.push(event);
+                break;
+              }
+            }
           }
         }
       } catch (e) {
