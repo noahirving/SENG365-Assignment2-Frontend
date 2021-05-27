@@ -19,20 +19,7 @@
 
     <!-- Categories -->
     <el-col :span="3">
-      <el-dropdown :hide-on-click="false" :max-height="300">
-        <el-button type="primary">
-          Categories<i class="el-icon-arrow-down el-icon--right"></i>
-        </el-button>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item v-for="(category, id) in categories" :key="id">
-              <el-checkbox v-model="activeCategories[id]">
-                {{category}}
-              </el-checkbox>
-            </el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
+      <CategorySelector v-on:categoryIds="updateSelectedCategoryIds"/>
     </el-col>
 
     <!-- Sort by -->
@@ -65,15 +52,15 @@ import EventCard from "@/components/EventCard";
 import events from "@/api/events";
 import CreateEvent from "@/components/CreateEvent";
 import {mapGetters} from "vuex";
+import CategorySelector from "@/components/CategorySelector";
 export default {
   name: "Events",
-  components: {CreateEvent, EventCard},
+  components: {CategorySelector, CreateEvent, EventCard},
   data() {
     return {
       events: [],
       eventsPage: [],
-      categories: {},
-      activeCategories: {},
+      selectedCategoryIds: [],
       sortings: [
         {
           name: "A-Z",
@@ -116,6 +103,10 @@ export default {
     }
   },
   methods: {
+    updateSelectedCategoryIds(ids) {
+      this.selectedCategoryIds = ids;
+      this.getEvents()
+    },
     async getEvents() {
       console.log('get events');
       const {status, data} = await this.axios.get("events",{ params: this.getParams()});
@@ -134,27 +125,11 @@ export default {
       const params = {};
       if (this.q !== "") params.q = this.q;
 
-      let categoryIds = [];
-      for (const id in this.activeCategories){
-        if (this.activeCategories[id]) categoryIds.push(id);
-      }
-      if (categoryIds.length > 0) params.categoryIds = categoryIds;
+      if (this.selectedCategoryIds.length > 0) params.categoryIds = this.selectedCategoryIds;
 
       if (this.sortBy !== null) params.sortBy = this.sortBy;
       return params;
-    },
-    async getCategories() {
-      try {
-        const {status, data} = await events.getCategories();
-        this.categories = data;
-        this.activeCategories = {};
-        for (const id in this.categories){
-          this.activeCategories[id] = false;
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    },
+    }
   },
   watch: {
     sortBy: function(){
@@ -175,7 +150,6 @@ export default {
     ...mapGetters(['isLoggedIn'])
   },
   mounted() {
-    this.getCategories();
     this.getEvents();
   }
 }
