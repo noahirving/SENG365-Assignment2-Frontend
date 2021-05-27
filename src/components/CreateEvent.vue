@@ -49,7 +49,7 @@
     </el-form>
     <template #footer>
     <span class="dialog-footer">
-      <el-button @click="visible = false">Cancel</el-button>
+      <el-button @click="close()">Cancel</el-button>
       <el-button type="primary" @click="createEvent">Save</el-button>
     </span>
     </template>
@@ -105,13 +105,12 @@ export default {
             this.requiresAttendanceControl,
             this.fee
         );
-        console.log(data);
 
         if (status === 201) {
           const response = await events.editImage(data.eventId, this.image.file);
-          this.visible = false;
+          this.close()
           this.$emit('created');
-          this.$message('Created');
+          this.$message.success('Created');
 
         }
       } catch (e) {
@@ -129,6 +128,20 @@ export default {
     setImage(image) {
       console.log(image);
       this.image = image;
+    },
+    close() {
+      this.visible = false;
+      this.title = ""
+      this.categoryIds = []
+      this.date = ""
+      this.image = {}
+      this.description = ""
+      this.capacity = 1
+      this.isOnline = false
+      this.url = ""
+      this.venue = ""
+      this.requiresAttendanceControl = false
+      this.fee = 0
     }
   }
 }
