@@ -26,7 +26,6 @@ export default {
           const {data} = await events.get(event.eventId);
           if (data.organizerId === this.userId) {
             this.myEvents.push(event);
-            break;
           } else {
             const {data} = await attendees.get(event.eventId);
             for (const attendee of data) {
