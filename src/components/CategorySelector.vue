@@ -20,7 +20,7 @@
 import events from '@/api/events';
 export default {
   name: "CategorySelector",
-  emits: ['categoryIds'],
+  emits: ['updated'],
   data() {
     return {
       categories: {},
@@ -46,7 +46,7 @@ export default {
     },
     updateSelected () {
       console.log(this.selectedCategories);
-      this.$emit('categoryIds', this.selectedCategories);
+      this.$emit('updated', this.selectedCategories);
     },
     async getCategories() {
       try {

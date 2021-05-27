@@ -19,7 +19,7 @@
 
     <!-- Categories -->
     <el-col :span="3">
-      <CategorySelector v-on:categoryIds="updateSelectedCategoryIds"/>
+      <CategorySelector v-on:updated="updateSelectedCategoryIds"/>
     </el-col>
 
     <!-- Sort by -->
