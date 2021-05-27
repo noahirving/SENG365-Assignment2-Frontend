@@ -108,8 +108,7 @@ export default {
       this.getEvents()
     },
     async getEvents() {
-      console.log('get events');
-      const {status, data} = await this.axios.get("events",{ params: this.getParams()});
+      const {status, data} = await events.getAll(this.getParams());
       if (status === 200) {
         this.events = data;
         this.totalEvents = this.events.length;

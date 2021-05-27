@@ -1,11 +1,12 @@
 import axios from "@/api/api.ts";
 
 export default {
-    getAll: async () => {
-        const response = await axios.get(`events`);
+    getAll: async (params) => {
+
+        const response = await axios.get(`events`, {params});
         if (response.status !== 200) return response;
         const events = response.data;
-        const {data} = await this.getCategories();
+        const {data} = await getCategories();
         const categories = data;
         for (const event of events) {
             event.categoryNames = event.categories.map(id => categories[id]);
@@ -17,17 +18,7 @@ export default {
     getImagePath: (eventId) =>  {
         return axios.defaults.baseURL + `events/${eventId}/image`
     },
-    getCategories: async () => {
-        const response = await axios.get(`events/categories`);
-        const categories = {};
-        for (const category of response.data) {
-            categories[category.id] = category.name;
-        }
-
-        response.data = categories;
-        return response;
-
-    },
+    getCategories,
     create: (
         title,
          description,
@@ -61,4 +52,13 @@ export default {
         }
         return axios.put(`events/${eventId}/image`, file, {headers});
     },
+}
+async function getCategories() {
+    const response = await axios.get(`events/categories`);
+    const categories = {};
+    for (const category of response.data) {
+        categories[category.id] = category.name;
+    }
+    response.data = categories;
+    return response;
 }

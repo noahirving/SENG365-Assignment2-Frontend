@@ -10,14 +10,16 @@
   <el-dialog
     title="Login"
     v-model="loginVisible">
+
     <el-form :model="loginForm">
-      <el-form-item label="Email" :label-width="labelWidth">
-        <el-input v-model="loginForm.email" autocomplete="off" :maxlength="inputWidth"/>
+      <el-form-item label="Email">
+        <el-input v-model="loginForm.email" autocomplete="off"/>
       </el-form-item>
-      <el-form-item label="Password" :label-width="labelWidth" >
-        <el-input type="password" v-model="loginForm.password" autocomplete="off" :maxlength="inputWidth"/>
+      <el-form-item label="Password">
+        <el-input type="password" v-model="loginForm.password" autocomplete="off"/>
       </el-form-item>
     </el-form>
+
     <template #footer>
     <span class="dialog-footer">
       <el-button @click="loginVisible = false">Cancel</el-button>
@@ -30,24 +32,26 @@
   <el-dialog
       title="Register"
       v-model="registerVisible">
+
     <el-form :model="registerForm">
-      <el-form-item label="First Name" :maxlength="labelWidth">
-        <el-input v-model="registerForm.firstName" :maxlength="inputWidth"/>
+      <el-form-item label="First Name">
+        <el-input v-model="registerForm.firstName"/>
       </el-form-item>
-      <el-form-item label="Last Name" :maxlength="labelWidth">
-        <el-input v-model="registerForm.lastName" :maxlength="inputWidth"/>
+      <el-form-item label="Last Name">
+        <el-input v-model="registerForm.lastName"/>
       </el-form-item>
-      <el-form-item label="Email" :maxlength="labelWidth">
-        <el-input v-model="registerForm.email" autocomplete="off" :maxlength="inputWidth"/>
+      <el-form-item label="Email">
+        <el-input v-model="registerForm.email" autocomplete="off"/>
       </el-form-item>
-      <el-form-item label="Password" :maxlength="labelWidth">
-        <el-input type="password" v-model="registerForm.password" autocomplete="off" :maxlength="inputWidth"/>
+      <el-form-item label="Password">
+        <el-input type="password" v-model="registerForm.password" autocomplete="off"/>
       </el-form-item>
     </el-form>
+
     <template #footer>
     <span class="dialog-footer">
       <el-button @click="registerVisible = false">Cancel</el-button>
-      <el-button type="primary" @click="register()">Login</el-button>
+      <el-button type="primary" @click="register()">Register</el-button>
     </span>
     </template>
   </el-dialog>
@@ -72,9 +76,7 @@ export default {
         lastName: "",
         email: "",
         password: "",
-      },
-      labelWidth: "120px",
-      inputWidth: "260px"
+      }
     }
   },
   methods: {
@@ -95,6 +97,7 @@ export default {
         console.log(response);
       } catch (e) {
         console.log(e);
+        this.$message.error(e.response.statusText);
       }
 
     },
@@ -109,7 +112,8 @@ export default {
           await this.$router.push("/");
         }
       } catch (e) {
-        console.log(e);
+        console.error(e);
+        this.$message.error(e.response.statusText);
       }
     },
     async logout() {
@@ -118,6 +122,7 @@ export default {
         await this.$router.push("/");
       } catch (e) {
         console.log(e);
+        this.$message.error(e.response.statusText);
       }
       this.removeAuth();
       this.axios.defaults.headers.common['X-Authorization'] = null;
