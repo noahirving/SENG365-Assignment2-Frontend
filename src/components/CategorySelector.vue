@@ -20,6 +20,9 @@
 import events from '@/api/events';
 export default {
   name: "CategorySelector",
+  props: {
+    initialIds: Array
+  },
   emits: ['updated'],
   data() {
     return {
@@ -52,16 +55,29 @@ export default {
         const {status, data} = await events.getCategories();
         this.categories = data;
         this.activeCategories = {};
-        for (const [id, _] in Object.entries(this.categories)) {
+        for (const [id, _] of Object.entries(this.categories)) {
           this.activeCategories[id] = false;
         }
       } catch (e) {
         console.log(e);
       }
     },
+    setInitialActive() {
+      for (const [id, _] of Object.entries(this.activeCategories)) {
+        if (this.initialIds.includes(parseInt(id))) {
+          this.activeCategories[id] = true;
+        }
+      }
+    },
+    async setup() {
+      await this.getCategories();
+      if (this.initialIds !== undefined){
+        this.setInitialActive()
+      }
+    }
   },
   mounted() {
-    this.getCategories();
+    this.setup()
   }
 }
 </script>

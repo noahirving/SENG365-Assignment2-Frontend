@@ -5,7 +5,10 @@
         <el-divider/>
         <el-header>
           <h1>{{event.title}}
-            <DeleteEvent v-if="isEventOwner" :id="id"/>
+            <template v-if="isEventOwner">
+              <EditEvent :event="event" :current-image="image" v-on:updated="edited" />
+              <DeleteEvent v-if="isEventOwner" :id="id"/>
+            </template>
           </h1>
         </el-header>
         <el-divider/>
@@ -63,9 +66,10 @@ import users from "@/api/users"
 import DeleteEvent from "@/components/DeleteEvent";
 import {mapState} from "vuex";
 import Attendees from "@/components/Attendees";
+import EditEvent from "@/components/EditEvent"
 export default {
   name: "Event",
-  components: {Attendees, DeleteEvent, EventCard},
+  components: {Attendees, DeleteEvent, EventCard, EditEvent},
   data() {
     return {
       event: null,
@@ -113,6 +117,10 @@ export default {
       } catch (e) {
         console.error(e);
       }
+    },
+    async edited() {
+      this.image.src = "";
+      await this.getEvent();
     },
     async setup() {
       await this.getEvent();

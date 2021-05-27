@@ -52,8 +52,12 @@ export default {
             requiresAttendanceControl,
             fee,
         };
-        console.log(body);
         return axios.post(`events`, body);
+    },
+    edit: (eventId, body) => {
+        console.log('trying')
+        return axios.patch(`events/${eventId}`, body);
+
     },
     editImage: (eventId, file) => {
         const headers = {

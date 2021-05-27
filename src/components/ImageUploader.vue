@@ -55,7 +55,6 @@ export default {
     setCurrentImage() {
       if (this.currentImageSrc !== undefined) {
         this.image.src = this.currentImageSrc;
-        console.log(this.image.src)
       }
     },
     deleteImage() {
@@ -67,8 +66,12 @@ export default {
       this.$emit("image", this.image);
     }
   },
+  watch: {
+    currentImageSrc() {
+      this.image.src = this.currentImageSrc;
+    }
+  },
   mounted() {
-    console.log(this.currentImageSrc)
     this.setCurrentImage();
 
   }
