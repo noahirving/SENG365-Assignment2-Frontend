@@ -53,7 +53,7 @@
   </el-row>
 
 
-  <Attendees :event-id="id" :organizer="isEventOwner" v-on:updated="getEvent" :key="attendeesKey"/>
+  <Attendees :event-id="id" :organizer="isEventOwner" :organizer-id="organizerId" v-on:updated="getEvent" :key="attendeesKey"/>
   <el-row>
     <el-container>
       <el-header>

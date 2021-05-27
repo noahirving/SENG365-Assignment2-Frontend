@@ -18,6 +18,11 @@
     </el-table-column>
     <el-table-column prop="firstName" label="First name"/>
     <el-table-column prop="lastName" label="Last name"/>
+    <el-table-column label="Role">
+      <template #default="scope">
+        {{getRole(scope.row)}}
+      </template>
+    </el-table-column>
     <el-table-column label="Date of interest">
       <template #default="scope">
         {{getDate(scope.row)}}
@@ -58,13 +63,14 @@ export default {
   name: "Attendees",
   props: {
     eventId: Number,
-    organizer: Boolean
+    organizer: Boolean,
+    organizerId: Number
   },
   emits: ['updated'],
   data() {
     return {
       attendees: [],
-      isOrganizer: false
+      isOrganizer: false,
     }
   },
   methods: {
@@ -75,6 +81,9 @@ export default {
       } catch (e) {
         console.error(e);
       }
+    },
+    getRole(attendee) {
+      return attendee.attendeeId == this.organizerId ? 'Organizer' : 'Attendee';
     },
     getDate(attendee) {
       const date = new Date(attendee.dateOfInterest);
