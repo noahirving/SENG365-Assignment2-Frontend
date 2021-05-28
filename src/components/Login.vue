@@ -10,6 +10,7 @@
   <el-dialog
     title="Login"
     v-model="loginVisible">
+    <el-container>
 
     <el-form :model="loginForm">
       <el-form-item label="Email">
@@ -20,9 +21,10 @@
       </el-form-item>
     </el-form>
 
+    </el-container>
     <template #footer>
     <span class="dialog-footer">
-      <el-button @click="loginVisible = false">Cancel</el-button>
+      <el-button @click="hide">Cancel</el-button>
       <el-button type="primary" @click="login()">Login</el-button>
     </span>
     </template>
@@ -33,6 +35,7 @@
       title="Register"
       v-model="registerVisible">
 
+    <el-container>
     <el-form :model="registerForm">
       <el-form-item label="First Name">
         <el-input v-model="registerForm.firstName"/>
@@ -46,11 +49,15 @@
       <el-form-item label="Password">
         <el-input type="password" v-model="registerForm.password" autocomplete="off"/>
       </el-form-item>
+      <el-form-item label="Profile image">
+        <image-uploader v-on:image="setImage" :key="imageKey"/>
+      </el-form-item>
     </el-form>
+    </el-container>
 
     <template #footer>
     <span class="dialog-footer">
-      <el-button @click="registerVisible = false">Cancel</el-button>
+      <el-button @click="hide">Cancel</el-button>
       <el-button type="primary" @click="register()">Register</el-button>
     </span>
     </template>
@@ -60,9 +67,11 @@
 <script>
 import {mapActions, mapGetters} from "vuex/dist/vuex.mjs";
 import users from "@/api/users";
+import ImageUploader from "@/components/ImageUploader";
 
 export default {
   name: "Login",
+  components: {ImageUploader},
   data() {
     return {
       loginVisible: false,
@@ -76,10 +85,20 @@ export default {
         lastName: "",
         email: "",
         password: "",
-      }
+      },
+
+      image: {
+        file: null,
+        src: ""
+      },
+
+      imageKey: 0
     }
   },
   methods: {
+    setImage(image) {
+      this.image = image;
+    },
     async register() {
       try {
         const response = await users.register(
@@ -93,6 +112,9 @@ export default {
           this.loginForm.email = this.registerForm.email;
           this.loginForm.password = this.registerForm.password;
           await this.login();
+          if (this.image.file !== null) {
+            await users.editImage(response.data.userId, this.image.file);
+          }
         }
         console.log(response);
       } catch (e) {
@@ -110,11 +132,32 @@ export default {
           this.axios.defaults.headers.common['X-Authorization'] = token;
           this.loginVisible = false;
           await this.$router.push("/");
+          this.clearForms();
         }
       } catch (e) {
         console.error(e);
         this.$message.error(e.response.statusText);
       }
+    },
+    clearForms() {
+
+      this.imageKey++;
+      this.loginForm = {
+        email: "",
+        password: ""
+      };
+      this.registerForm = {
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: "",
+      };
+
+    },
+    hide() {
+      this.clearForms();
+      this.loginVisible = false;
+      this.registerVisible = false;
     },
     async logout() {
       try {
