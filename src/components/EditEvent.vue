@@ -30,8 +30,8 @@
       <el-form-item label="Is Online">
         <el-checkbox v-model="isOnline" type="checkbox" @change="updateIsOnline"/>
       </el-form-item>
-      <el-form-item label="URL" v-if="isOnline">
-        <el-input v-model="url" :disabled="!isOnline"/>
+      <el-form-item label="URL">
+        <el-input v-model="url"/>
       </el-form-item>
       <el-form-item label="venue" v-if="!isOnline">
         <el-input v-model="venue" :disabled="isOnline"/>
@@ -135,7 +135,6 @@ export default {
     },
     updateIsOnline() {
       if (this.isOnline) this.venue = "";
-      else this.url = "";
     },
     setImage(image) {
       this.image = image;
@@ -144,7 +143,7 @@ export default {
       this.title = this.event.title;
       this.description = this.event.description;
       this.categoryIds = this.event.categories;
-      this.date = new Date(this.event.date).toISOString();
+      this.date = this.event.date.toLocaleString();
       this.isOnline = Boolean(this.event.isOnline);
       this.url = this.event.url || "";
       this.venue = this.event.venue || "";

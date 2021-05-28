@@ -13,9 +13,6 @@
       <el-form-item label="Title">
         <el-input v-model="title"/>
       </el-form-item>
-<!--      <el-form-item label="Categories">
-        <el-input v-model="categoryIds"/>
-      </el-form-item>-->
       <el-form-item label="Date, Time">
         <el-input v-model="date" type="datetime-local"/>
       </el-form-item>
@@ -34,8 +31,8 @@
       <el-form-item label="Is Online">
         <el-checkbox v-model="isOnline" type="checkbox" @change="updateIsOnline"/>
       </el-form-item>
-      <el-form-item label="URL" v-if="isOnline">
-        <el-input v-model="url" :disabled="!isOnline"/>
+      <el-form-item label="URL">
+        <el-input v-model="url" />
       </el-form-item>
       <el-form-item label="venue" v-if="!isOnline">
         <el-input v-model="venue" :disabled="isOnline"/>
@@ -123,7 +120,6 @@ export default {
     },
     updateIsOnline() {
       if (this.isOnline) this.venue = "";
-      else this.url = "";
     },
     setImage(image) {
       console.log(image);
